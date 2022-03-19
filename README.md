@@ -1,2 +1,2 @@
-# TerminalWallet
-Fictional crypto wallet usable directly from your terminal 💻⚡️
+# TerminalTrivia
+Trivia game playable directly from your terminal 💻⚡️
