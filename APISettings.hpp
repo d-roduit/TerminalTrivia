@@ -1,21 +1,23 @@
 #pragma once
 
+#include <string>
+
 class APISettings {
 
 private:
-    int difficulty;
-    int type;
+    std::string difficulty;
+    std::string type;
     int category;
     const int amount{ 1 };
 
 public:
     static APISettings& getInstance();
-    int getDifficulty();
-    int getType();
+    std::string getDifficulty();
+    std::string getType();
     int getCategory();
     int getAmount();
-    void setDifficulty(int pDifficulty);
-    void setType(int pType);
+    void setDifficulty(std::string pDifficulty);
+    void setType(std::string pType);
     void setCategory(int pCategory);
 
     APISettings(APISettings const&) = delete;

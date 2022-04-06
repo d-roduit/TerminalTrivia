@@ -6,16 +6,16 @@ APISettings& APISettings::getInstance() {
 }
 
 APISettings::APISettings() {
-	difficulty = 0;
-	type = 0;
-	category = 0;
+	difficulty = "";
+	type = "";
+	category = -1;
 }
 
-int APISettings::getDifficulty() {
+std::string APISettings::getDifficulty() {
 	return difficulty;
 }
 
-int APISettings::getType() {
+std::string APISettings::getType() {
 	return type;
 }
 
@@ -27,11 +27,11 @@ int APISettings::getAmount() {
 	return amount;
 }
 
-void APISettings::setDifficulty(int pDifficulty) {
+void APISettings::setDifficulty(std::string pDifficulty) {
 	difficulty = pDifficulty;
 }
 
-void APISettings::setType(int pType) {
+void APISettings::setType(std::string pType) {
 	type = pType;
 }
 
