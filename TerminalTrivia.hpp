@@ -17,6 +17,4 @@ private:
     void renderPlay();
     void renderSettings();
     void renderStats();
-    void quit();
-
 };
