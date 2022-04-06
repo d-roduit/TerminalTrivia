@@ -5,20 +5,20 @@
 class Settings {
 
 private:
+    int category;
     std::string difficulty;
     std::string type;
-    int category;
     const int amount{ 1 };
 
 public:
     static Settings& getInstance();
+    int getCategory();
     std::string getDifficulty();
     std::string getType();
-    int getCategory();
     int getAmount();
+    void setCategory(int pCategory);
     void setDifficulty(std::string pDifficulty);
     void setType(std::string pType);
-    void setCategory(int pCategory);
     
     Settings(Settings const&) = delete;
     void operator=(Settings const&) = delete;

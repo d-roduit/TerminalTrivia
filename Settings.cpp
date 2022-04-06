@@ -11,6 +11,10 @@ Settings::Settings() {
 	category = -1;
 }
 
+int Settings::getCategory() {
+	return category;
+}
+
 std::string Settings::getDifficulty() {
 	return difficulty;
 }
@@ -19,12 +23,12 @@ std::string Settings::getType() {
 	return type;
 }
 
-int Settings::getCategory() {
-	return category;
-}
-
 int Settings::getAmount() {
 	return amount;
+}
+
+void Settings::setCategory(int pCategory) {
+	category = pCategory;
 }
 
 void Settings::setDifficulty(std::string pDifficulty) {
@@ -33,8 +37,4 @@ void Settings::setDifficulty(std::string pDifficulty) {
 
 void Settings::setType(std::string pType) {
 	type = pType;
-}
-
-void Settings::setCategory(int pCategory) {
-	category = pCategory;
 }
