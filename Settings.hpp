@@ -2,7 +2,7 @@
 
 #include <string>
 
-class APISettings {
+class Settings {
 
 private:
     std::string difficulty;
@@ -11,7 +11,7 @@ private:
     const int amount{ 1 };
 
 public:
-    static APISettings& getInstance();
+    static Settings& getInstance();
     std::string getDifficulty();
     std::string getType();
     int getCategory();
@@ -19,10 +19,10 @@ public:
     void setDifficulty(std::string pDifficulty);
     void setType(std::string pType);
     void setCategory(int pCategory);
-
-    APISettings(APISettings const&) = delete;
-    void operator=(APISettings const&) = delete;
+    
+    Settings(Settings const&) = delete;
+    void operator=(Settings const&) = delete;
 
 private:
-    APISettings();
+    Settings();
 };

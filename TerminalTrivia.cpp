@@ -7,28 +7,15 @@
 #include <ftxui/dom/elements.hpp>   // for filler, text, hbox, vbox
 #include <ftxui/screen/screen.hpp>  // for Full, Screen
 #include "AsciiDisplayUtils.hpp"
-#include <memory>                   // for allocator
 #include <string>
-#include <iostream>
-#include <sstream>
+#include "TerminalTrivia.hpp"
 
-int main() {
+TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()) {
+	renderMenu();
+}
+
+void TerminalTrivia::renderMenu() {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
-
-    auto settings = [] {
-        ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
-        ftxui::Component settings = ftxui::Container::Vertical({
-            ftxui::Button("Back", screen.ExitLoopClosure())
-        });
-        screen.Loop(settings);
-    };
-
-    ftxui::Component menu = ftxui::Container::Vertical({
-        ftxui::Button("Play", [&] { }),
-        ftxui::Button("Settings", settings),
-        ftxui::Button("Stats", [&] {}),
-        ftxui::Button("Quit", screen.ExitLoopClosure())
-    });
 
     std::string terminalTriviaAsciiArt = R"(
  _____                   _             _ _____     _       _       
@@ -38,25 +25,56 @@ int main() {
   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_| |_||_|  |_| \_/ |_|\__,_|
     )";
 
-    ftxui::Component document = ftxui::Renderer(menu, [&] {
+    ftxui::Component playButton = ftxui::Button("Play", [&] {});
+    ftxui::Component settingsButton = ftxui::Button("Settings", [&] { renderSettings(); });
+    ftxui::Component statsButton = ftxui::Button("Stats", [&] {});
+    ftxui::Component quitButton = ftxui::Button("Quit", screen.ExitLoopClosure());
+
+    ftxui::Component navigationLayout = ftxui::Container::Vertical({
+        playButton,
+        settingsButton,
+        statsButton,
+        quitButton
+    });
+
+    ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
         return ftxui::vbox({
-            ftxui::hbox(),
+            //ftxui::hbox(),
             ftxui::filler(),
             ftxui::hbox({
                 ftxui::filler(),
                 ftxui::vbox({
                     AsciiDisplayUtils::asciiArt(terminalTriviaAsciiArt) | ftxui::color(ftxui::Color::Blue),
-                    ftxui::vbox(
-                        ftxui::borderEmpty(menu->Render())
-                    )
+                    ftxui::vbox({
+                        ftxui::borderEmpty(navigationLayout->Render()),
+                    }),
                 }),
-                ftxui::filler()
+                ftxui::filler(),
             }),
             ftxui::filler(),
-            ftxui::hbox(),
+            //ftxui::hbox(),
+            });
         });
-    });
 
-    screen.Loop(document);
-    return 0;
+    screen.Loop(renderedLayout);
+}
+
+void TerminalTrivia::renderPlay() {
+
+}
+
+void TerminalTrivia::renderSettings() {
+    ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
+    ftxui::Component settings = ftxui::Container::Vertical({
+        ftxui::Button("Back", screen.ExitLoopClosure())
+        });
+    screen.Loop(settings);
+}
+
+void TerminalTrivia::renderStats() {
+
+}
+
+void TerminalTrivia::quit() {
+
 }

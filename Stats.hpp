@@ -12,6 +12,7 @@ public:
     int getNbPositiveAnswers();
     int getPositiveAnswersRate();
     void incrementNbAnsweredQuestions(bool hasAnsweredCorrectly);
+
     Stats(Stats const&) = delete;
     void operator=(Stats const&) = delete;
 
