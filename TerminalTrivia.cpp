@@ -6,8 +6,10 @@
 #include "ftxui/screen/color.hpp"  // for Color, Color::Blue, Color::Green, Color::Red
 #include <ftxui/dom/elements.hpp>   // for filler, text, hbox, vbox
 #include <ftxui/screen/screen.hpp>  // for Full, Screen
-#include "AsciiDisplayUtils.hpp"
+#include <thread>
+#include <chrono>
 #include <string>
+#include "AsciiDisplayUtils.hpp"
 #include "TerminalTrivia.hpp"
 
 TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()) {
@@ -26,7 +28,7 @@ void TerminalTrivia::renderMenu() {
     )";
 
     // Components
-    ftxui::Component playButton = ftxui::Button("Play", [&] {});
+    ftxui::Component playButton = ftxui::Button("Play", [&] { renderPlay(); });
     ftxui::Component settingsButton = ftxui::Button("Settings", [&] { renderSettings(); });
     ftxui::Component statsButton = ftxui::Button("Stats", [&] { renderStats(); });
     ftxui::Component quitButton = ftxui::Button("Quit", screen.ExitLoopClosure());
@@ -59,6 +61,69 @@ void TerminalTrivia::renderMenu() {
 }
 
 void TerminalTrivia::renderPlay() {
+    ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
+
+    int correctAnswerIndex = 2;
+    int selectedAnswerIndex = -1;
+
+    // Components
+    ftxui::Component backButton = ftxui::Button(" Back to menu ", screen.ExitLoopClosure());
+    std::vector<ftxui::Component> answerButtons;
+    for (size_t i{ 0 }; i < 4; i++) {
+        answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(i + 97)) + ")", [&selectedAnswerIndex, i] {
+            selectedAnswerIndex = i;
+        }));
+    }
+
+    ftxui::Component answerButtonsNavigationLayout = ftxui::Container::Vertical(answerButtons);
+
+    ftxui::Component answerButtonsRenderedLayout = ftxui::Renderer(answerButtonsNavigationLayout, [&] {
+        ftxui::Elements renderedButtons;
+        ftxui::Element renderedButton;
+
+        if (selectedAnswerIndex == -1) {
+            for (ftxui::Component button : answerButtons) renderedButtons.push_back(button->Render());
+        }
+        else {
+            for (size_t i{ 0 }; i < answerButtons.size(); i++) {
+                if (i == correctAnswerIndex) {
+                    renderedButton = answerButtons[i]->Render() | ftxui::color(ftxui::Color::Green);
+                }
+                else {
+                    if (i == selectedAnswerIndex) {
+                        renderedButton = answerButtons[i]->Render() | ftxui::color(ftxui::Color::Red);
+                    }
+                    else {
+                        renderedButton = answerButtons[i]->Render();
+                    }
+                }
+                renderedButtons.push_back(renderedButton);
+            }
+        }
+
+        renderedButtons.push_back(ftxui::text("selectedAnswerIndex: " + std::to_string(selectedAnswerIndex)));
+
+        return ftxui::vbox(renderedButtons);
+    });
+
+    ftxui::Component navigationLayout = ftxui::Container::Vertical({
+        backButton,
+        answerButtonsNavigationLayout,
+    });
+
+    ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
+        return ftxui::vbox({
+            ftxui::hbox({
+                backButton->Render(),
+            }),
+            ftxui::vbox({
+                ftxui::hcenter(ftxui::text("Question") | ftxui::bold | ftxui::color(ftxui::Color::Blue)),
+                answerButtonsRenderedLayout->Render() | ftxui::border,
+            }),
+        });
+    });
+
+    screen.Loop(renderedLayout);
 }
 
 void TerminalTrivia::renderSettings() {
