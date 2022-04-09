@@ -11,7 +11,7 @@
 #include "TerminalTrivia.hpp"
 
 TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()) {
-	renderMenu();
+    renderMenu();
 }
 
 void TerminalTrivia::renderMenu() {
@@ -65,63 +65,19 @@ void TerminalTrivia::renderPlay() {
 void TerminalTrivia::renderSettings() {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
-    std::vector<std::string> tabs {
+    std::vector<std::string> tabEntries{
         "Category",
         "Difficulty",
         "Type",
     };
     int selectedTab = 0;
 
-    std::vector<std::string> categories {
-        "Any Category",
-        "General Knowledge",
-        "Entertainment: Books",
-        "Entertainment: Film",
-        "Entertainment: Music",
-        "Entertainment: Musicals & Theatres",
-        "Entertainment: Television",
-        "Entertainment: Video Games",
-        "Entertainment: Board Games",
-        "Science & Nature",
-        "Science: Computers",
-        "Science: Mathematics",
-        "Mythology",
-        "Sports",
-        "Geography",
-        "History",
-        "Politics",
-        "Art",
-        "Celebrities",
-        "Animals",
-        "Vehicles",
-        "Entertainment: Comics",
-        "Science: Gadgets",
-        "Entertainment: Japanese Anime & Manga",
-        "Entertainment: Cartoon & Animations",
-    };
-    int selectedCategory = 0;
-
-    std::vector<std::string> difficulties {
-        "Any Difficulty",
-        "Easy",
-        "Medium",
-        "Hard",
-    };
-    int selectedDifficulty = 0;
-
-    std::vector<std::string> types {
-        "Any Type",
-        "Multiple Choice",
-        "True / False",
-    };
-    int selectedType = 0;
-
     // Components
     ftxui::Component backButton = ftxui::Button(" Back ", screen.ExitLoopClosure());
-    ftxui::Component categoryRadiobox = ftxui::Radiobox(&categories, &selectedCategory);
-    ftxui::Component difficultyRadiobox = ftxui::Radiobox(&difficulties, &selectedDifficulty);
-    ftxui::Component typeRadiobox = ftxui::Radiobox(&types, &selectedType);
-    ftxui::Component tabsToggle = ftxui::Toggle(&tabs, &selectedTab);
+    ftxui::Component categoryRadiobox = ftxui::Radiobox(&settings.getCategoryNameEntries(), &settings.selectedCategory);
+    ftxui::Component difficultyRadiobox = ftxui::Radiobox(&settings.getDifficultyEntries(), &settings.selectedDifficulty);
+    ftxui::Component typeRadiobox = ftxui::Radiobox(&settings.getTypeEntries(), &settings.selectedType);
+    ftxui::Component tabsToggle = ftxui::Toggle(&tabEntries, &selectedTab);
     ftxui::Component tabsContainer = ftxui::Container::Tab({
         categoryRadiobox,
         difficultyRadiobox,
