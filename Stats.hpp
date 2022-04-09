@@ -8,9 +8,9 @@ private:
 
 public:
     static Stats& getInstance();
-    int getNbAnsweredQuestions();
-    int getNbPositiveAnswers();
-    int getPositiveAnswersRate();
+    int getNbAnsweredQuestions() const;
+    int getNbPositiveAnswers() const;
+    int getPositiveAnswersRate() const;
     void incrementNbAnsweredQuestions(bool hasAnsweredCorrectly);
 
     Stats(Stats const&) = delete;

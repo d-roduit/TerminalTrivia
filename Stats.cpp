@@ -11,15 +11,15 @@ Stats::Stats() {
 	nbPositiveAnswers = 0;
 }
 
-int Stats::getNbAnsweredQuestions() {
+int Stats::getNbAnsweredQuestions() const {
 	return nbAnsweredQuestions;
 }
 
-int Stats::getNbPositiveAnswers() {
+int Stats::getNbPositiveAnswers() const {
 	return nbPositiveAnswers;
 }
 
-int Stats::getPositiveAnswersRate() {
+int Stats::getPositiveAnswersRate() const {
 	if (nbAnsweredQuestions == 0) return 0;
 	return (int)round((nbPositiveAnswers / (double)nbAnsweredQuestions) * 100);
 }

@@ -28,7 +28,7 @@ void TerminalTrivia::renderMenu() {
     // Components
     ftxui::Component playButton = ftxui::Button("Play", [&] {});
     ftxui::Component settingsButton = ftxui::Button("Settings", [&] { renderSettings(); });
-    ftxui::Component statsButton = ftxui::Button("Stats", [&] {});
+    ftxui::Component statsButton = ftxui::Button("Stats", [&] { renderStats(); });
     ftxui::Component quitButton = ftxui::Button("Quit", screen.ExitLoopClosure());
 
     ftxui::Component navigationLayout = ftxui::Container::Vertical({
@@ -59,7 +59,6 @@ void TerminalTrivia::renderMenu() {
 }
 
 void TerminalTrivia::renderPlay() {
-
 }
 
 void TerminalTrivia::renderSettings() {
@@ -110,5 +109,39 @@ void TerminalTrivia::renderSettings() {
 }
 
 void TerminalTrivia::renderStats() {
+    ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
+    // Components
+    ftxui::Component backButton = ftxui::Button(" Back ", screen.ExitLoopClosure());
+
+    ftxui::Component navigationLayout = ftxui::Container::Vertical({
+        backButton,
+    });
+
+    ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
+        return ftxui::vbox({
+            ftxui::hbox({
+                backButton->Render(),
+            }),
+            ftxui::vbox({
+                ftxui::hcenter(ftxui::text("Stats") | ftxui::bold | ftxui::color(ftxui::Color::Blue)),
+                ftxui::hbox({
+                    ftxui::vbox({
+                        ftxui::text("Number of questions answered:"),
+                        ftxui::text("Number of positive answers:"),
+                        ftxui::text("Positive answers rate:"),
+                    }),
+                    ftxui::separatorEmpty(),
+                    ftxui::separatorEmpty(),
+                    ftxui::vbox({
+                        ftxui::text(std::to_string(stats.getNbAnsweredQuestions())),
+                        ftxui::text(std::to_string(stats.getNbPositiveAnswers())),
+                        ftxui::text(std::to_string(stats.getPositiveAnswersRate()) + "%"),
+                    }),
+                }) | ftxui::border,
+            }),
+        });
+    });
+
+    screen.Loop(renderedLayout);
 }
