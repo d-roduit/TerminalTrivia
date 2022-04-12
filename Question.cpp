@@ -1,6 +1,5 @@
-#include <algorithm>
-#include <random>
 #include "Question.hpp"
+#include <iostream>
 
 std::mt19937 Question::RANDOM_NUMBER_GENERATOR{ std::random_device{}() };
 
@@ -15,38 +14,34 @@ Question::Question(
     std::string pQuestion,
     std::string pCorrectAnswer,
     std::vector<std::string> pIncorrectAnswers
-) : distribution((type == "multiple") ? DISTRIBUTION_0_3 : DISTRIBUTION_0_1) {
+) : distribution((pType == "multiple") ? DISTRIBUTION_0_3 : DISTRIBUTION_0_1) {
     category = pCategory;
     type = pType;
     difficulty = pDifficulty;
     question = pQuestion;
     correctAnswer = pCorrectAnswer;
     incorrectAnswers = pIncorrectAnswers;
-    correctAnswerIndex = -1;
+
+    allPossibleAnswers = { incorrectAnswers };
+    correctAnswerIndex = distribution(RANDOM_NUMBER_GENERATOR);
+    allPossibleAnswers.insert(allPossibleAnswers.begin() + correctAnswerIndex, correctAnswer);
 }
 
-std::string Question::getCategory() const { return category; }
+const std::string Question::getCategory() const { return category; }
 
-std::string Question::getType() const { return type; }
+const std::string Question::getType() const { return type; }
 
-std::string Question::getDifficulty() const { return difficulty; }
+const std::string Question::getDifficulty() const { return difficulty; }
 
-std::string Question::getQuestion() const { return question; }
+const std::string Question::getQuestion() const { return question; }
 
-std::string Question::getCorrectAnswer() const { return correctAnswer; }
+const std::string Question::getCorrectAnswer() const { return correctAnswer; }
 
 const std::vector<std::string>& Question::getIncorrectAnswers() const { return incorrectAnswers; }
 
-const std::vector<std::string>& Question::getAllPossibleAnswers() {
-	allPossibleAnswers = { incorrectAnswers };
-    correctAnswerIndex = distribution(RANDOM_NUMBER_GENERATOR);
-    allPossibleAnswers.insert(allPossibleAnswers.begin() + correctAnswerIndex, correctAnswer);
-	return allPossibleAnswers;
-}
+const std::vector<std::string>& Question::getAllPossibleAnswers() const { return allPossibleAnswers; }
 
-int Question::getCorrectAnswerIndex() const {
-    return correctAnswerIndex;
-}
+const int Question::getCorrectAnswerIndex() const { return correctAnswerIndex; }
 
 /*
 void Question::setCategory(std::string pCategory) {

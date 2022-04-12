@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -28,14 +30,14 @@ public:
         std::string pCorrectAnswer,
         std::vector<std::string> pIncorrectAnswers
     );
-    std::string getCategory() const;
-    std::string getType() const;
-    std::string getDifficulty() const;
-    std::string getQuestion() const;
-    std::string getCorrectAnswer() const;
+    const std::string getCategory() const;
+    const std::string getType() const;
+    const std::string getDifficulty() const;
+    const std::string getQuestion() const;
+    const std::string getCorrectAnswer() const;
     const std::vector<std::string>& getIncorrectAnswers() const;
-    const std::vector<std::string>& getAllPossibleAnswers();
-    int getCorrectAnswerIndex() const;
+    const std::vector<std::string>& getAllPossibleAnswers() const;
+    const int getCorrectAnswerIndex() const;
     /*
     void setCategory(std::string pCategory);
     void setType(std::string pType);
