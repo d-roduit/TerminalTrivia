@@ -29,16 +29,14 @@ void TerminalTrivia::renderMenu() {
     )";
 
     // Components
-    ftxui::Component playButton = ftxui::Button("Play", [&] { renderPlay(); });
+    ftxui::Component playButton = ftxui::Button("Play", [&] { renderPlay(0); });
     ftxui::Component settingsButton = ftxui::Button("Settings", [&] { renderSettings(); });
     ftxui::Component statsButton = ftxui::Button("Stats", [&] { renderStats(); });
-    ftxui::Component quitButton = ftxui::Button("Quit", screen.ExitLoopClosure());
 
     ftxui::Component navigationLayout = ftxui::Container::Vertical({
         playButton,
         settingsButton,
-        statsButton,
-        quitButton
+        statsButton
     });
 
     ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
@@ -61,90 +59,94 @@ void TerminalTrivia::renderMenu() {
     screen.Loop(renderedLayout);
 }
 
-void TerminalTrivia::renderPlay() {
+void TerminalTrivia::renderPlay(int questionIndex) {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
-    // State
-    int selectedAnswerIndex{ -1 };
-    bool hasUserAnswered{ false };
-    bool isUserAnswerCorrect{ false };
-    ftxui::Component questionComponentNavigationLayout;
-
-    /* ---------------------------------------------------
-    * Question component
-    *--------------------------------------------------- */
-    auto createQuestionComponent = [&selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect, &questionComponentNavigationLayout](Question& question) {
-
-        // Components
-        std::vector<ftxui::Component> answerButtons;
-        for (size_t answerIndex{ 0 }; answerIndex < question.getAllPossibleAnswers().size(); answerIndex++) {
-            answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + question.getAllPossibleAnswers()[answerIndex], [&question, &selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect, answerIndex] {
-                selectedAnswerIndex = answerIndex;
-                hasUserAnswered = true;
-                isUserAnswerCorrect = (answerIndex == question.getCorrectAnswerIndex());
-            }));
-        }
-
-        questionComponentNavigationLayout = ftxui::Container::Vertical(answerButtons);
-
-        return ftxui::Renderer(questionComponentNavigationLayout, [&question, answerButtons, &selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect] {
-            std::vector<ftxui::Element> renderedButtons;
-
-            if (!hasUserAnswered) {
-                for (const ftxui::Component& answerButton: answerButtons) {
-                    renderedButtons.push_back(answerButton->Render());
-                }
-            } else {
-                for (size_t answerIndex{ 0 }; answerIndex < answerButtons.size(); answerIndex++) {
-                    if (answerIndex == question.getCorrectAnswerIndex()) {
-                        renderedButtons.push_back(answerButtons[answerIndex]->Render() | ftxui::color(ftxui::Color::Green));
-                        continue;
-                    }
-                    
-                    if (answerIndex == selectedAnswerIndex) {
-                        renderedButtons.push_back(answerButtons[answerIndex]->Render() | ftxui::color(ftxui::Color::Red));
-                        continue;
-                    }
-                                        
-                    renderedButtons.push_back(answerButtons[answerIndex]->Render());
-                }
-            }
-            
-            return ftxui::vbox({
-                ftxui::hbox({
-                    ftxui::text("Question:") | ftxui::bold | ftxui::color(ftxui::Color::Orange1),
-                    ftxui::separatorEmpty(),
-                    ftxui::separatorEmpty(),
-                    ftxui::separatorEmpty(),
-                    ftxui::text(question.getQuestion()) | ftxui::bold | ftxui::color(ftxui::Color::Orange1),
-                }),
-                ftxui::separatorEmpty(),
-                ftxui::vbox(renderedButtons),
-                (hasUserAnswered && isUserAnswerCorrect) ? ftxui::text("Good answer!") | ftxui::color(ftxui::Color::Green) : ftxui::emptyElement(),
-                (hasUserAnswered && !isUserAnswerCorrect) ? ftxui::text("Oh noo, you will have more chance next question!") | ftxui::color(ftxui::Color::Red) : ftxui::emptyElement(),
-                ftxui::text("selectedAnswerIndex: " + std::to_string(selectedAnswerIndex)),
-            });
-        });
-    };
-
-    /* ---------------------------------------------------
-    * Play screen component
-    *--------------------------------------------------- */
-
+    // Play State
     std::vector<Question> questions{
         Question{ "12", "multiple", "easy", "What is 3 * 5 ?", "15", { "10", "12", "17"} },
         Question{ "12", "boolean", "medium", "Is 10 * 12 = 120 ?", "True", { "False" } },
         Question{ "12", "boolean", "medium", "Is 10 * 0.5 = 50 ?", "False", { "True" } },
         Question{ "13", "multiple", "medium", "How much do I love Thubidu ?", "With passion", { "A bit", "It's okay", "Much" } },
     };
-    int questionIndex{ 0 };
 
-    // Components
-    ftxui::Component backButton = ftxui::Button(" Back to menu ", screen.ExitLoopClosure());
-    ftxui::Component questionComponent = createQuestionComponent(questions[questionIndex]);
-    ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [&questionIndex] {
-        questionIndex++;
-        // Recreate here all the things for a new question
+    // Question State
+    int selectedAnswerIndex{ -1 };
+    bool hasUserAnswered{ false };
+    bool isUserAnswerCorrect{ false };
+    
+    /* ---------------------------------------------------
+    * Question component
+    *--------------------------------------------------- */
+    std::vector<ftxui::Component> answerButtons{};
+    for (size_t answerIndex{ 0 }; answerIndex < questions[questionIndex].getAllPossibleAnswers().size(); answerIndex++) {
+        answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex], [&questions, &questionIndex, &selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect, answerIndex] {
+            selectedAnswerIndex = answerIndex;
+            hasUserAnswered = true;
+            isUserAnswerCorrect = (answerIndex == questions[questionIndex].getCorrectAnswerIndex());
+        }));
+    }
+
+    // Reset the question state
+    selectedAnswerIndex = -1;
+    hasUserAnswered = false;
+    isUserAnswerCorrect = false;
+
+    ftxui::Component questionComponentNavigationLayout = ftxui::Container::Vertical(answerButtons);
+
+    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [answerButtons, &questions, &questionIndex, &selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect]() {
+        std::vector<ftxui::Element> renderedButtons{};
+
+        if (!hasUserAnswered) {
+            for (const ftxui::Component& answerButton : answerButtons) {
+                renderedButtons.push_back(answerButton->Render());
+            }
+        }
+        else {
+            for (size_t answerIndex{ 0 }; answerIndex < answerButtons.size(); answerIndex++) {
+                if (answerIndex == questions[questionIndex].getCorrectAnswerIndex()) {
+                    renderedButtons.push_back(answerButtons[answerIndex]->Render() | ftxui::color(ftxui::Color::Green));
+                    continue;
+                }
+
+                if (answerIndex == selectedAnswerIndex) {
+                    renderedButtons.push_back(answerButtons[answerIndex]->Render() | ftxui::color(ftxui::Color::Red));
+                    continue;
+                }
+
+                renderedButtons.push_back(answerButtons[answerIndex]->Render());
+            }
+        }
+
+        return ftxui::vbox({
+            ftxui::hbox({
+                ftxui::text("Question:") | ftxui::bold | ftxui::color(ftxui::Color::Orange1),
+                ftxui::separatorEmpty(),
+                ftxui::separatorEmpty(),
+                ftxui::separatorEmpty(),
+                ftxui::text(questions[questionIndex].getQuestion()) | ftxui::bold | ftxui::color(ftxui::Color::Orange1),
+            }),
+            ftxui::separatorEmpty(),
+            ftxui::vbox(renderedButtons),
+            (hasUserAnswered && isUserAnswerCorrect) ? ftxui::text("Good answer!") | ftxui::color(ftxui::Color::Green) : ftxui::emptyElement(),
+            (hasUserAnswered && !isUserAnswerCorrect) ? ftxui::text("Oh noo, you will have more chance next question!") | ftxui::color(ftxui::Color::Red) : ftxui::emptyElement(),
+            ftxui::text("selectedAnswerIndex: " + std::to_string(selectedAnswerIndex)),
+        });
+    });
+
+    /* ---------------------------------------------------
+    * Play component
+    *--------------------------------------------------- */
+    ftxui::Component backButton = ftxui::Button(" Back to menu ", [this] { renderMenu(); });
+    ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [this, &questionIndex, &questions] {
+        if (questionIndex + 1 >= questions.size()) {
+            questionIndex = 0;
+        }
+        else {
+            questionIndex += 1;
+        }
+
+        renderPlay(questionIndex);
     });
 
     ftxui::Component mainNavigationLayout = ftxui::Container::Vertical({
@@ -153,7 +155,7 @@ void TerminalTrivia::renderPlay() {
         nextQuestionButton,
     });
 
-    ftxui::Component mainRenderedLayout = ftxui::Renderer(mainNavigationLayout, [&] {
+    ftxui::Component mainRenderedLayout = ftxui::Renderer(mainNavigationLayout, [backButton, questionComponentRenderer, nextQuestionButton] {
         return ftxui::vbox({
             ftxui::hbox({
                 backButton->Render(),
@@ -161,7 +163,7 @@ void TerminalTrivia::renderPlay() {
             ftxui::vbox({
                 ftxui::hcenter(ftxui::text("Play") | ftxui::bold | ftxui::color(ftxui::Color::Blue)),
                 ftxui::separatorEmpty(),
-                questionComponent->Render(),
+                questionComponentRenderer->Render(),
                 ftxui::separatorEmpty(),
                 ftxui::hbox({
                     nextQuestionButton->Render(),

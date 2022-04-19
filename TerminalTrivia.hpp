@@ -14,7 +14,7 @@ public:
 
 private:
     void renderMenu();
-    void renderPlay();
+    void renderPlay(int questionIndex);
     void renderSettings();
     void renderStats();
 };
