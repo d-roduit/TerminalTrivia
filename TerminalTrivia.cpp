@@ -157,7 +157,9 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     * Play component
     *--------------------------------------------------- */
     ftxui::Component backButton = ftxui::Button(" Back to menu ", [this] { renderMenu(); });
-    ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [this, &questionIndex, &questions] {
+    ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [this, &hasUserAnswered, &questionIndex, &questions] {
+        if (!hasUserAnswered) return;
+
         if (questionIndex + 1 >= questions.size()) {
             questionIndex = 0;
         }
