@@ -63,14 +63,15 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
     // Play State
+    int mainNavigationSelectedButton{ 1 };
+
+    // Question State
     std::vector<Question> questions{
         Question{ "12", "multiple", "easy", "What is 3 * 5 ?", "15", { "10", "12", "17"} },
         Question{ "12", "boolean", "medium", "Is 10 * 12 = 120 ?", "True", { "False" } },
         Question{ "12", "boolean", "medium", "Is 10 * 0.5 = 50 ?", "False", { "True" } },
         Question{ "13", "multiple", "medium", "How much do I love Thubidu ?", "With passion", { "A bit", "It's okay", "Much" } },
     };
-
-    // Question State
     int selectedAnswerIndex{ -1 };
     bool hasUserAnswered{ false };
     bool isUserAnswerCorrect{ false };
@@ -80,21 +81,37 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     *--------------------------------------------------- */
     std::vector<ftxui::Component> answerButtons{};
     for (size_t answerIndex{ 0 }; answerIndex < questions[questionIndex].getAllPossibleAnswers().size(); answerIndex++) {
-        answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex], [&questions, &questionIndex, &selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect, answerIndex] {
-            selectedAnswerIndex = answerIndex;
-            hasUserAnswered = true;
-            isUserAnswerCorrect = (answerIndex == questions[questionIndex].getCorrectAnswerIndex());
+        answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex], [
+            &mainNavigationSelectedButton,
+            &questions,
+            &questionIndex,
+            &selectedAnswerIndex,
+            &hasUserAnswered,
+            &isUserAnswerCorrect,
+            answerIndex
+        ] {
+            if (!hasUserAnswered) {
+                selectedAnswerIndex = answerIndex;
+                isUserAnswerCorrect = (answerIndex == questions[questionIndex].getCorrectAnswerIndex());
+                hasUserAnswered = true;
+            }
+
+            // It is always 2 because the "nextQuestionButton" component is index 2 in the "mainNavigationLayout" component.
+            // The answer buttons are not taken into consideration in the "mainNavigationLayout" component.
+            mainNavigationSelectedButton = 2;
         }));
     }
 
-    // Reset the question state
-    selectedAnswerIndex = -1;
-    hasUserAnswered = false;
-    isUserAnswerCorrect = false;
-
     ftxui::Component questionComponentNavigationLayout = ftxui::Container::Vertical(answerButtons);
 
-    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [answerButtons, &questions, &questionIndex, &selectedAnswerIndex, &hasUserAnswered, &isUserAnswerCorrect]() {
+    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [
+        answerButtons,
+        &questions,
+        &questionIndex,
+        &selectedAnswerIndex,
+        &hasUserAnswered,
+        &isUserAnswerCorrect
+    ]() {
         std::vector<ftxui::Element> renderedButtons{};
 
         if (!hasUserAnswered) {
@@ -153,7 +170,7 @@ void TerminalTrivia::renderPlay(int questionIndex) {
         backButton,
         questionComponentNavigationLayout,
         nextQuestionButton,
-    });
+    }, &mainNavigationSelectedButton);
 
     ftxui::Component mainRenderedLayout = ftxui::Renderer(mainNavigationLayout, [backButton, questionComponentRenderer, nextQuestionButton] {
         return ftxui::vbox({
