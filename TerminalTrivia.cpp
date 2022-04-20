@@ -82,6 +82,7 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     std::vector<ftxui::Component> answerButtons{};
     for (size_t answerIndex{ 0 }; answerIndex < questions[questionIndex].getAllPossibleAnswers().size(); answerIndex++) {
         answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex], [
+            this,
             &mainNavigationSelectedButton,
             &questions,
             &questionIndex,
@@ -91,9 +92,10 @@ void TerminalTrivia::renderPlay(int questionIndex) {
             answerIndex
         ] {
             if (!hasUserAnswered) {
+                hasUserAnswered = true;
                 selectedAnswerIndex = answerIndex;
                 isUserAnswerCorrect = (answerIndex == questions[questionIndex].getCorrectAnswerIndex());
-                hasUserAnswered = true;
+                stats.incrementNbAnsweredQuestions(isUserAnswerCorrect);
             }
 
             // It is always 2 because the "nextQuestionButton" component is index 2 in the "mainNavigationLayout" component.
