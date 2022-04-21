@@ -234,7 +234,7 @@ void TerminalTrivia::renderSettings() {
                 ftxui::vbox({
                     tabsToggle->Render(),
                     ftxui::separator(),
-                    tabsContainer->Render(),
+                    (selectedTab != 0) ? tabsContainer->Render() : tabsContainer->Render() | ftxui::vscroll_indicator | ftxui::frame,
                 }) | ftxui::border,
             }),
         });
