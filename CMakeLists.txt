@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
-# Output the build of the libraries to the same folder as the executable
+# Configure the output directory for the libraries to be the same as the executable directory
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
@@ -45,3 +45,6 @@ target_link_libraries(TerminalTrivia
 	PRIVATE ftxui::dom
 	PRIVATE ftxui::component
 )
+
+# Copy sounds folder in the same directory as the executable
+file(COPY sounds DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

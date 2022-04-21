@@ -50,6 +50,12 @@ Settings::Settings() {
         "True / False",
     };
     selectedType = 0;
+
+    soundEffectEntries = {
+        "On",
+        "Off",
+    };
+    selectedSoundEffect = 0;
 }
 
 int Settings::getCategoryId() const {
@@ -68,6 +74,10 @@ int Settings::getAmount() const {
     return amount;
 }
 
+bool Settings::areSoundEffectsEnabled() const {
+    return (soundEffectEntries[selectedSoundEffect] == "On") ? true : false;
+}
+
 const std::vector<std::string>& Settings::getCategoryNameEntries() const {
     return categoryNameEntries;
 }
@@ -78,4 +88,8 @@ const std::vector<std::string>& Settings::getDifficultyEntries() const {
 
 const std::vector<std::string>& Settings::getTypeEntries() const {
     return typeEntries;
+}
+
+const std::vector<std::string>& Settings::getSoundEffectEntries() const {
+    return soundEffectEntries;
 }

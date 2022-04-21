@@ -1,3 +1,4 @@
+#include "Windows.h"
 #include "ftxui/component/captured_mouse.hpp"  // for ftxui
 #include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
 #include "ftxui/component/component_base.hpp"      // for ComponentBase
@@ -96,6 +97,10 @@ void TerminalTrivia::renderPlay(int questionIndex) {
                 selectedAnswerIndex = answerIndex;
                 isUserAnswerCorrect = (answerIndex == questions[questionIndex].getCorrectAnswerIndex());
                 stats.incrementNbAnsweredQuestions(isUserAnswerCorrect);
+                if (settings.areSoundEffectsEnabled()) {
+                    const std::string soundFileName = (isUserAnswerCorrect) ? "answer_correct_sound.wav" : "answer_wrong_sound.wav";
+                    PlaySound(TEXT(("sounds/" + soundFileName).c_str()), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+                }
             }
 
             // It is always 2 because the "nextQuestionButton" component is index 2 in the "mainNavigationLayout" component.
@@ -203,6 +208,7 @@ void TerminalTrivia::renderSettings() {
         "Category",
         "Difficulty",
         "Type",
+        "Sound Effects",
     };
     int selectedTab = 0;
 
@@ -211,11 +217,13 @@ void TerminalTrivia::renderSettings() {
     ftxui::Component categoryRadiobox = ftxui::Radiobox(&settings.getCategoryNameEntries(), &settings.selectedCategory);
     ftxui::Component difficultyRadiobox = ftxui::Radiobox(&settings.getDifficultyEntries(), &settings.selectedDifficulty);
     ftxui::Component typeRadiobox = ftxui::Radiobox(&settings.getTypeEntries(), &settings.selectedType);
+    ftxui::Component soundEffectRadiobox = ftxui::Radiobox(&settings.getSoundEffectEntries(), &settings.selectedSoundEffect);
     ftxui::Component tabsToggle = ftxui::Toggle(&tabEntries, &selectedTab);
     ftxui::Component tabsContainer = ftxui::Container::Tab({
         categoryRadiobox,
         difficultyRadiobox,
         typeRadiobox,
+        soundEffectRadiobox,
     }, &selectedTab);
 
     ftxui::Component navigationLayout = ftxui::Container::Vertical({
