@@ -9,9 +9,7 @@ class Question {
 
 private:
     static std::mt19937 RANDOM_NUMBER_GENERATOR;
-    static std::uniform_int_distribution<std::mt19937::result_type> DISTRIBUTION_0_1;
     static std::uniform_int_distribution<std::mt19937::result_type> DISTRIBUTION_0_3;
-    const std::uniform_int_distribution<std::mt19937::result_type>& distribution;
     std::string category;
     std::string type;
     std::string difficulty;

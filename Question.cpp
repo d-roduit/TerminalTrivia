@@ -3,8 +3,6 @@
 
 std::mt19937 Question::RANDOM_NUMBER_GENERATOR{ std::random_device{}() };
 
-std::uniform_int_distribution<std::mt19937::result_type> Question::DISTRIBUTION_0_1{ 0, 1 };
-
 std::uniform_int_distribution<std::mt19937::result_type> Question::DISTRIBUTION_0_3{ 0, 3 };
 
 Question::Question(
@@ -14,7 +12,7 @@ Question::Question(
     std::string pQuestion,
     std::string pCorrectAnswer,
     std::vector<std::string> pIncorrectAnswers
-) : distribution((pType == "multiple") ? DISTRIBUTION_0_3 : DISTRIBUTION_0_1) {
+) {
     category = pCategory;
     type = pType;
     difficulty = pDifficulty;
@@ -23,7 +21,14 @@ Question::Question(
     incorrectAnswers = pIncorrectAnswers;
 
     allPossibleAnswers = { incorrectAnswers };
-    correctAnswerIndex = distribution(RANDOM_NUMBER_GENERATOR);
+
+    if (pType == "multiple") {
+        correctAnswerIndex = DISTRIBUTION_0_3(RANDOM_NUMBER_GENERATOR);
+    }
+    else {
+        correctAnswerIndex = (correctAnswer == "True") ? 0 : 1;
+    }
+
     allPossibleAnswers.insert(allPossibleAnswers.begin() + correctAnswerIndex, correctAnswer);
 }
 
