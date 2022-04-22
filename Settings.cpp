@@ -1,3 +1,4 @@
+#include <ctime>
 #include "Settings.hpp"
 
 Settings& Settings::getInstance() {
@@ -6,34 +7,6 @@ Settings& Settings::getInstance() {
 }
 
 Settings::Settings() {
-    categoryIdEntries = { 0, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
-    categoryNameEntries = {
-        "Any Category",
-        "General Knowledge",
-        "Entertainment: Books",
-        "Entertainment: Film",
-        "Entertainment: Music",
-        "Entertainment: Musicals & Theatres",
-        "Entertainment: Television",
-        "Entertainment: Video Games",
-        "Entertainment: Board Games",
-        "Science & Nature",
-        "Science: Computers",
-        "Science: Mathematics",
-        "Mythology",
-        "Sports",
-        "Geography",
-        "History",
-        "Politics",
-        "Art",
-        "Celebrities",
-        "Animals",
-        "Vehicles",
-        "Entertainment: Comics",
-        "Science: Gadgets",
-        "Entertainment: Japanese Anime & Manga",
-        "Entertainment: Cartoon & Animations",
-    };
     selectedCategory = 0;
 
     difficultyEntries = {
@@ -56,25 +29,28 @@ Settings::Settings() {
         "Off",
     };
     selectedSoundEffect = 0;
+
+    const std::time_t timestamp{ std::time(nullptr) };
+    APISessionToken = "TERMINALTRIVIA_SESSION_TOKEN_" + std::to_string(timestamp);
 }
 
-int Settings::getCategoryId() const {
+const int Settings::getCategoryId() const {
     return categoryIdEntries[selectedCategory];
 }
 
-std::string Settings::getDifficulty() const {
+const std::string Settings::getDifficulty() const {
     return difficultyEntries[selectedDifficulty];
 }
 
-std::string Settings::getType() const {
+const std::string Settings::getType() const {
     return typeEntries[selectedType];
 }
 
-int Settings::getAmount() const {
+const int Settings::getAmount() const {
     return amount;
 }
 
-bool Settings::areSoundEffectsEnabled() const {
+const bool Settings::areSoundEffectsEnabled() const {
     return (soundEffectEntries[selectedSoundEffect] == "On") ? true : false;
 }
 
@@ -92,4 +68,16 @@ const std::vector<std::string>& Settings::getTypeEntries() const {
 
 const std::vector<std::string>& Settings::getSoundEffectEntries() const {
     return soundEffectEntries;
+}
+
+const std::string Settings::getAPISessionToken() const {
+    return APISessionToken;
+}
+
+void Settings::setCategoryIdEntries(const std::vector<int> pCategoryIdEntries) {
+    categoryIdEntries = pCategoryIdEntries;
+}
+
+void Settings::setCategoryNameEntries(const std::vector<std::string> pCategoryNameEntries) {
+    categoryNameEntries = pCategoryNameEntries;
 }

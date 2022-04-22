@@ -7,14 +7,40 @@
 #include "ftxui/screen/color.hpp"  // for Color, Color::Blue, Color::Green, Color::Red
 #include <ftxui/dom/elements.hpp>   // for filler, text, hbox, vbox
 #include <ftxui/screen/screen.hpp>  // for Full, Screen
+#include <cpr/cpr.h>
+#include <nlohmann/json.hpp>
 #include <thread>
 #include <chrono>
 #include <string>
+#include <iostream>
 #include "AsciiDisplayUtils.hpp"
 #include "Question.hpp"
 #include "TerminalTrivia.hpp"
 
 TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()) {
+
+    // Fetch Trivia categories from API
+    cpr::Response r = cpr::Get(cpr::Url{ "https://opentdb.com/api_category.php" });
+
+    // Parse JSON response
+    nlohmann::json j = nlohmann::json::parse(r.text);
+
+    // Set categories ids and names into settings
+    std::vector<int> categoryIdEntries{};
+    std::vector<std::string> categoryNameEntries{};
+
+    for (nlohmann::json triviaCategory : j["trivia_categories"]) {
+        if (!triviaCategory["id"].is_number_integer() || !triviaCategory["name"].is_string()) {
+            continue;
+        }
+        categoryIdEntries.push_back(triviaCategory["id"]);
+        categoryNameEntries.push_back(triviaCategory["name"]);
+    }
+
+    settings.setCategoryIdEntries(categoryIdEntries);
+    settings.setCategoryNameEntries(categoryNameEntries);
+    
+    // Render the game menu
     renderMenu();
 }
 
