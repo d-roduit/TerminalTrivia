@@ -200,11 +200,23 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     ftxui::Component mainNavigationLayout = ftxui::Container::Vertical({
         backButton,
         questionComponentNavigationLayout,
-        nextQuestionButton,
     }, &mainNavigationSelectedButton);
 
     // Component which will be rendered
     ftxui::Component mainRenderedLayout = ftxui::Renderer(mainNavigationLayout, [&] {
+        ftxui::Element nextQuestionButtonContainer{ ftxui::emptyElement() };
+        
+        // Add nextQuestionButton to the UI only if user has already answered
+        if (hasUserAnswered) {
+            mainNavigationLayout->Add(nextQuestionButton);
+            nextQuestionButtonContainer = ftxui::vbox({
+                ftxui::separatorEmpty(),
+                ftxui::hbox({
+                    nextQuestionButton->Render(),
+                }),
+            });
+        }
+
         return ftxui::vbox({
             ftxui::hbox({
                 backButton->Render(),
@@ -213,10 +225,7 @@ void TerminalTrivia::renderPlay(int questionIndex) {
                 ftxui::hcenter(ftxui::text("Play") | ftxui::bold | ftxui::color(ftxui::Color::Blue)),
                 ftxui::separatorEmpty(),
                 questionComponentRenderer->Render(),
-                ftxui::separatorEmpty(),
-                ftxui::hbox({
-                    nextQuestionButton->Render(),
-                }),
+                nextQuestionButtonContainer,
             }),
         });
     });
