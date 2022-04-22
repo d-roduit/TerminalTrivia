@@ -47,6 +47,7 @@ TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stat
 void TerminalTrivia::renderMenu() {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
+    // Game title
     std::string terminalTriviaAsciiArt = R"(
  _____                   _             _ _____     _       _       
 |_   _|__ _ __ _ __ ___ (_)_ __   __ _| |_   _| __(_)_   ___) __ _ 
@@ -55,17 +56,19 @@ void TerminalTrivia::renderMenu() {
   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_| |_||_|  |_| \_/ |_|\__,_|
     )";
 
-    // Components
+    // UI Components
     ftxui::Component playButton = ftxui::Button("Play", [&] { renderPlay(0); });
     ftxui::Component settingsButton = ftxui::Button("Settings", [&] { renderSettings(); });
     ftxui::Component statsButton = ftxui::Button("Stats", [&] { renderStats(); });
 
+    // Navigation Components
     ftxui::Component navigationLayout = ftxui::Container::Vertical({
         playButton,
         settingsButton,
         statsButton
     });
 
+    // Components which will be rendered
     ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
         return ftxui::vbox({
             ftxui::filler(),
@@ -89,10 +92,10 @@ void TerminalTrivia::renderMenu() {
 void TerminalTrivia::renderPlay(int questionIndex) {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
-    // Play State
+    // Play Component State
     int mainNavigationSelectedButton{ 1 };
 
-    // Question State
+    // Question Component State
     std::vector<Question> questions{
         Question{ "12", "multiple", "easy", "What is 3 * 5 ?", "15", { "10", "12", "17"} },
         Question{ "12", "boolean", "medium", "Is 10 * 12 = 120 ?", "True", { "False" } },
@@ -106,18 +109,12 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     /* ---------------------------------------------------
     * Question component
     *--------------------------------------------------- */
+    // UI Components
     std::vector<ftxui::Component> answerButtons{};
     for (size_t answerIndex{ 0 }; answerIndex < questions[questionIndex].getAllPossibleAnswers().size(); answerIndex++) {
-        answerButtons.push_back(ftxui::Button("(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex], [
-            this,
-            &mainNavigationSelectedButton,
-            &questions,
-            &questionIndex,
-            &selectedAnswerIndex,
-            &hasUserAnswered,
-            &isUserAnswerCorrect,
-            answerIndex
-        ] {
+        std::string buttonText = "(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex];
+
+        auto buttonOnClick = [&, answerIndex] {
             if (!hasUserAnswered) {
                 hasUserAnswered = true;
                 selectedAnswerIndex = answerIndex;
@@ -132,19 +129,16 @@ void TerminalTrivia::renderPlay(int questionIndex) {
             // It is always 2 because the "nextQuestionButton" component is index 2 in the "mainNavigationLayout" component.
             // The answer buttons are not taken into consideration in the "mainNavigationLayout" component.
             mainNavigationSelectedButton = 2;
-        }));
+        };
+
+        answerButtons.push_back(ftxui::Button(buttonText, buttonOnClick));
     }
 
+    // Navigation Components
     ftxui::Component questionComponentNavigationLayout = ftxui::Container::Vertical(answerButtons);
 
-    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [
-        answerButtons,
-        &questions,
-        &questionIndex,
-        &selectedAnswerIndex,
-        &hasUserAnswered,
-        &isUserAnswerCorrect
-    ]() {
+    // Components which will be rendered
+    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [&, answerButtons]() {
         std::vector<ftxui::Element> renderedButtons{};
 
         if (!hasUserAnswered) {
@@ -187,8 +181,9 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     /* ---------------------------------------------------
     * Play component
     *--------------------------------------------------- */
-    ftxui::Component backButton = ftxui::Button(" Back to menu ", [this] { renderMenu(); });
-    ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [this, &hasUserAnswered, &questionIndex, &questions] {
+    // UI Components
+    ftxui::Component backButton = ftxui::Button(" Back to menu ", [&] { renderMenu(); });
+    ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [&] {
         if (!hasUserAnswered) return;
 
         if (questionIndex + 1 >= questions.size()) {
@@ -201,13 +196,15 @@ void TerminalTrivia::renderPlay(int questionIndex) {
         renderPlay(questionIndex);
     });
 
+    // Navigation Components
     ftxui::Component mainNavigationLayout = ftxui::Container::Vertical({
         backButton,
         questionComponentNavigationLayout,
         nextQuestionButton,
     }, &mainNavigationSelectedButton);
 
-    ftxui::Component mainRenderedLayout = ftxui::Renderer(mainNavigationLayout, [backButton, questionComponentRenderer, nextQuestionButton] {
+    // Component which will be rendered
+    ftxui::Component mainRenderedLayout = ftxui::Renderer(mainNavigationLayout, [&] {
         return ftxui::vbox({
             ftxui::hbox({
                 backButton->Render(),
@@ -230,6 +227,7 @@ void TerminalTrivia::renderPlay(int questionIndex) {
 void TerminalTrivia::renderSettings() {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
+    // Tabs State
     std::vector<std::string> tabEntries{
         "Category",
         "Difficulty",
@@ -238,7 +236,7 @@ void TerminalTrivia::renderSettings() {
     };
     int selectedTab = 0;
 
-    // Components
+    // UI Components
     ftxui::Component backButton = ftxui::Button(" Back ", screen.ExitLoopClosure());
     ftxui::Component categoryRadiobox = ftxui::Radiobox(&settings.getCategoryNameEntries(), &settings.selectedCategory);
     ftxui::Component difficultyRadiobox = ftxui::Radiobox(&settings.getDifficultyEntries(), &settings.selectedDifficulty);
@@ -252,12 +250,14 @@ void TerminalTrivia::renderSettings() {
         soundEffectRadiobox,
     }, &selectedTab);
 
+    // Navigation Components
     ftxui::Component navigationLayout = ftxui::Container::Vertical({
         backButton,
         tabsToggle,
         tabsContainer
     });
 
+    // Component which will be rendered
     ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
         return ftxui::vbox({
             ftxui::hbox({
@@ -280,13 +280,15 @@ void TerminalTrivia::renderSettings() {
 void TerminalTrivia::renderStats() {
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
-    // Components
+    // UI Components
     ftxui::Component backButton = ftxui::Button(" Back ", screen.ExitLoopClosure());
 
+    // Navigation Components
     ftxui::Component navigationLayout = ftxui::Container::Vertical({
         backButton,
     });
 
+    // Component which will be rendered
     ftxui::Component renderedLayout = ftxui::Renderer(navigationLayout, [&] {
         return ftxui::vbox({
             ftxui::hbox({
