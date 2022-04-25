@@ -1,4 +1,4 @@
-#include "Windows.h"
+#include "Windows.h" // for PlaySound
 #include "ftxui/component/captured_mouse.hpp"  // for ftxui
 #include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
 #include "ftxui/component/component_base.hpp"      // for ComponentBase
@@ -12,34 +12,27 @@
 #include <thread>
 #include <chrono>
 #include <string>
-#include <iostream>
 #include "AsciiDisplayUtils.hpp"
 #include "Question.hpp"
 #include "TerminalTrivia.hpp"
 
-TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()) {
+TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()), triviaAPI(TriviaAPI::getInstance()) {
+  
+    // Set categories ids (=APIValue) and names (=Display) from API into settings
+    // We must initialize the categoryAPIValueEntries and categoryDisplayEntries variables with the entry "Any Category"
+    // because the fetched trivia categories strangely do not contain the basic "Any Category" entry.
+    const std::map<int, std::string> categoriesMap{ triviaAPI.fetchCategories() };
+    std::vector<int> categoryAPIValueEntries{ -1 };
+    std::vector<std::string> categoryDisplayEntries{ "Any Category" };
 
-    // Fetch Trivia categories from API
-    cpr::Response r = cpr::Get(cpr::Url{ "https://opentdb.com/api_category.php" });
-
-    // Parse JSON response
-    nlohmann::json j = nlohmann::json::parse(r.text);
-
-    // Set categories ids and names into settings
-    std::vector<int> categoryIdEntries{};
-    std::vector<std::string> categoryNameEntries{};
-
-    for (nlohmann::json triviaCategory : j["trivia_categories"]) {
-        if (!triviaCategory["id"].is_number_integer() || !triviaCategory["name"].is_string()) {
-            continue;
-        }
-        categoryIdEntries.push_back(triviaCategory["id"]);
-        categoryNameEntries.push_back(triviaCategory["name"]);
+    for (const auto& [categoryId, categoryName] : categoriesMap) {
+        categoryAPIValueEntries.push_back(categoryId);
+        categoryDisplayEntries.push_back(categoryName);
     }
 
-    settings.setCategoryIdEntries(categoryIdEntries);
-    settings.setCategoryNameEntries(categoryNameEntries);
-    
+    settings.setCategoryAPIValueEntries(categoryAPIValueEntries);
+    settings.setCategoryDisplayEntries(categoryDisplayEntries);
+
     // Render the game menu
     renderMenu();
 }
@@ -57,7 +50,7 @@ void TerminalTrivia::renderMenu() {
     )";
 
     // UI Components
-    ftxui::Component playButton = ftxui::Button("Play", [&] { renderPlay(0); });
+    ftxui::Component playButton = ftxui::Button("Play", [&] { renderPlay(); });
     ftxui::Component settingsButton = ftxui::Button("Settings", [&] { renderSettings(); });
     ftxui::Component statsButton = ftxui::Button("Stats", [&] { renderStats(); });
 
@@ -89,36 +82,32 @@ void TerminalTrivia::renderMenu() {
     screen.Loop(renderedLayout);
 }
 
-void TerminalTrivia::renderPlay(int questionIndex) {
+void TerminalTrivia::renderPlay() {
+    Question question{ triviaAPI.fetchQuestion(settings.getCategoryAPIValue(), settings.getTypeAPIValue(), settings.getDifficultyAPIValue()) };
+
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
     // Play Component State
-    int mainNavigationSelectedButton{ 1 };
+    int mainNavigationSelectedButton{ 1 }; // 1 always corresponds to the first button of the answer buttons
 
     // Question Component State
-    std::vector<Question> questions{
-        Question{ "12", "multiple", "easy", "What is 3 * 5 ?", "15", { "10", "12", "17"} },
-        Question{ "12", "boolean", "medium", "Is 10 * 12 = 120 ?", "True", { "False" } },
-        Question{ "12", "boolean", "medium", "Is 10 * 0.5 = 50 ?", "False", { "True" } },
-        Question{ "13", "multiple", "medium", "How much do I love Thubidu ?", "With passion", { "A bit", "It's okay", "Much" } },
-    };
     int selectedAnswerIndex{ -1 };
     bool hasUserAnswered{ false };
     bool isUserAnswerCorrect{ false };
-    
+ 
     /* ---------------------------------------------------
     * Question component
     *--------------------------------------------------- */
     // UI Components
     std::vector<ftxui::Component> answerButtons{};
-    for (size_t answerIndex{ 0 }; answerIndex < questions[questionIndex].getAllPossibleAnswers().size(); answerIndex++) {
-        std::string buttonText = "(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + questions[questionIndex].getAllPossibleAnswers()[answerIndex];
+    for (std::size_t answerIndex{ 0 }; answerIndex < question.getAllPossibleAnswers().size(); answerIndex++) {
+        std::string buttonText = "(" + std::string(1, static_cast<char>(answerIndex + 97)) + ")  " + question.getAllPossibleAnswers()[answerIndex];
 
         auto buttonOnClick = [&, answerIndex] {
             if (!hasUserAnswered) {
                 hasUserAnswered = true;
                 selectedAnswerIndex = answerIndex;
-                isUserAnswerCorrect = (answerIndex == questions[questionIndex].getCorrectAnswerIndex());
+                isUserAnswerCorrect = (answerIndex == question.getCorrectAnswerIndex());
                 stats.incrementNbAnsweredQuestions(isUserAnswerCorrect);
                 if (settings.areSoundEffectsEnabled()) {
                     const std::string soundFileName = (isUserAnswerCorrect) ? "answer_correct_sound.wav" : "answer_wrong_sound.wav";
@@ -138,7 +127,7 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     ftxui::Component questionComponentNavigationLayout = ftxui::Container::Vertical(answerButtons);
 
     // Components which will be rendered
-    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [&, answerButtons]() {
+    ftxui::Component questionComponentRenderer = ftxui::Renderer(questionComponentNavigationLayout, [&]() {
         std::vector<ftxui::Element> renderedButtons{};
 
         if (!hasUserAnswered) {
@@ -147,8 +136,8 @@ void TerminalTrivia::renderPlay(int questionIndex) {
             }
         }
         else {
-            for (size_t answerIndex{ 0 }; answerIndex < answerButtons.size(); answerIndex++) {
-                if (answerIndex == questions[questionIndex].getCorrectAnswerIndex()) {
+            for (std::size_t answerIndex{ 0 }; answerIndex < answerButtons.size(); answerIndex++) {
+                if (answerIndex == question.getCorrectAnswerIndex()) {
                     renderedButtons.push_back(answerButtons[answerIndex]->Render() | ftxui::color(ftxui::Color::Green));
                     continue;
                 }
@@ -168,13 +157,14 @@ void TerminalTrivia::renderPlay(int questionIndex) {
                 ftxui::separatorEmpty(),
                 ftxui::separatorEmpty(),
                 ftxui::separatorEmpty(),
-                ftxui::text(questions[questionIndex].getQuestion()) | ftxui::bold | ftxui::color(ftxui::Color::Orange1),
+                ftxui::paragraph(question.getQuestion()) | ftxui::bold | ftxui::color(ftxui::Color::Orange1),
             }),
             ftxui::separatorEmpty(),
             ftxui::vbox(renderedButtons),
-            (hasUserAnswered && isUserAnswerCorrect) ? ftxui::text("Good answer!") | ftxui::color(ftxui::Color::Green) : ftxui::emptyElement(),
-            (hasUserAnswered && !isUserAnswerCorrect) ? ftxui::text("Oh noo, you will have more chance next question!") | ftxui::color(ftxui::Color::Red) : ftxui::emptyElement(),
-            ftxui::text("selectedAnswerIndex: " + std::to_string(selectedAnswerIndex)),
+            (hasUserAnswered) ? ftxui::separatorEmpty() : ftxui::emptyElement(),
+            (hasUserAnswered && isUserAnswerCorrect) ? ftxui::text("Good answer !") | ftxui::color(ftxui::Color::Green) : ftxui::emptyElement(),
+            (hasUserAnswered && !isUserAnswerCorrect) ? ftxui::text("You will have better luck next question :)") | ftxui::color(ftxui::Color::Red) : ftxui::emptyElement(),
+            //ftxui::text("selectedAnswerIndex: " + std::to_string(selectedAnswerIndex)),
         });
     });
 
@@ -185,15 +175,7 @@ void TerminalTrivia::renderPlay(int questionIndex) {
     ftxui::Component backButton = ftxui::Button(" Back to menu ", [&] { renderMenu(); });
     ftxui::Component nextQuestionButton = ftxui::Button(" Next question ", [&] {
         if (!hasUserAnswered) return;
-
-        if (questionIndex + 1 >= questions.size()) {
-            questionIndex = 0;
-        }
-        else {
-            questionIndex += 1;
-        }
-
-        renderPlay(questionIndex);
+        renderPlay();
     });
 
     // Navigation Components
@@ -247,9 +229,9 @@ void TerminalTrivia::renderSettings() {
 
     // UI Components
     ftxui::Component backButton = ftxui::Button(" Back ", screen.ExitLoopClosure());
-    ftxui::Component categoryRadiobox = ftxui::Radiobox(&settings.getCategoryNameEntries(), &settings.selectedCategory);
-    ftxui::Component difficultyRadiobox = ftxui::Radiobox(&settings.getDifficultyEntries(), &settings.selectedDifficulty);
-    ftxui::Component typeRadiobox = ftxui::Radiobox(&settings.getTypeEntries(), &settings.selectedType);
+    ftxui::Component categoryRadiobox = ftxui::Radiobox(&settings.getCategoryDisplayEntries(), &settings.selectedCategory);
+    ftxui::Component difficultyRadiobox = ftxui::Radiobox(&settings.getDifficultyDisplayEntries(), &settings.selectedDifficulty);
+    ftxui::Component typeRadiobox = ftxui::Radiobox(&settings.getTypeDisplayEntries(), &settings.selectedType);
     ftxui::Component soundEffectRadiobox = ftxui::Radiobox(&settings.getSoundEffectEntries(), &settings.selectedSoundEffect);
     ftxui::Component tabsToggle = ftxui::Toggle(&tabEntries, &selectedTab);
     ftxui::Component tabsContainer = ftxui::Container::Tab({

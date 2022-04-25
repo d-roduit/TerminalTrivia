@@ -4,6 +4,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <map>
 
 class Question {
 
@@ -36,12 +37,4 @@ public:
     const std::vector<std::string>& getIncorrectAnswers() const;
     const std::vector<std::string>& getAllPossibleAnswers() const;
     const int getCorrectAnswerIndex() const;
-    /*
-    void setCategory(std::string pCategory);
-    void setType(std::string pType);
-    void setDifficulty(std::string pDifficulty);
-    void setQuestion(std::string pQuestion);
-    void setCorrectAnswer(std::string pCorrectAnswer);
-    void setIncorrectAnswers(std::vector<std::string> pIncorrectAnswers);
-    */
 };

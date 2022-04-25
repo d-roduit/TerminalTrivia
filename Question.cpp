@@ -1,5 +1,5 @@
 #include "Question.hpp"
-#include <iostream>
+#include <sstream>
 
 std::mt19937 Question::RANDOM_NUMBER_GENERATOR{ std::random_device{}() };
 
@@ -47,29 +47,3 @@ const std::vector<std::string>& Question::getIncorrectAnswers() const { return i
 const std::vector<std::string>& Question::getAllPossibleAnswers() const { return allPossibleAnswers; }
 
 const int Question::getCorrectAnswerIndex() const { return correctAnswerIndex; }
-
-/*
-void Question::setCategory(std::string pCategory) {
-    category = pCategory;
-}
-
-void Question::setType(std::string pType) {
-    type = pType;
-}
-
-void Question::setDifficulty(std::string pDifficulty) {
-    difficulty = pDifficulty;
-}
-
-void Question::setQuestion(std::string pQuestion) {
-    question = pQuestion;
-}
-
-void Question::setCorrectAnswer(std::string pCorrectAnswer) {
-    correctAnswer = pCorrectAnswer;
-}
-
-void Question::setIncorrectAnswers(std::vector<std::string> pIncorrectAnswers) {
-    incorrectAnswers = pIncorrectAnswers;
-}
-*/

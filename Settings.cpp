@@ -1,3 +1,5 @@
+#include <cpr/cpr.h>
+#include <nlohmann/json.hpp>
 #include <ctime>
 #include "Settings.hpp"
 
@@ -9,18 +11,29 @@ Settings& Settings::getInstance() {
 Settings::Settings() {
     selectedCategory = 0;
 
-    difficultyEntries = {
+    difficultyDisplayEntries = {
         "Any Difficulty",
         "Easy",
         "Medium",
         "Hard",
     };
+    difficultyAPIValueEntries = {
+        "",
+        "easy",
+        "medium",
+        "hard",
+    };
     selectedDifficulty = 0;
 
-    typeEntries = {
+    typeDisplayEntries = {
         "Any Type",
         "Multiple Choice",
         "True / False",
+    };
+    typeAPIValueEntries = {
+        "",
+        "multiple",
+        "boolean",
     };
     selectedType = 0;
 
@@ -29,55 +42,44 @@ Settings::Settings() {
         "Off",
     };
     selectedSoundEffect = 0;
-
-    const std::time_t timestamp{ std::time(nullptr) };
-    APISessionToken = "TERMINALTRIVIA_SESSION_TOKEN_" + std::to_string(timestamp);
 }
 
-const int Settings::getCategoryId() const {
-    return categoryIdEntries[selectedCategory];
+const int Settings::getCategoryAPIValue() const {
+    return categoryAPIValueEntries[selectedCategory];
 }
 
-const std::string Settings::getDifficulty() const {
-    return difficultyEntries[selectedDifficulty];
+const std::string Settings::getDifficultyAPIValue() const {
+    return difficultyAPIValueEntries[selectedDifficulty];
 }
 
-const std::string Settings::getType() const {
-    return typeEntries[selectedType];
-}
-
-const int Settings::getAmount() const {
-    return amount;
+const std::string Settings::getTypeAPIValue() const {
+    return typeAPIValueEntries[selectedType];
 }
 
 const bool Settings::areSoundEffectsEnabled() const {
     return (soundEffectEntries[selectedSoundEffect] == "On") ? true : false;
 }
 
-const std::vector<std::string>& Settings::getCategoryNameEntries() const {
-    return categoryNameEntries;
+const std::vector<std::string>& Settings::getCategoryDisplayEntries() const {
+    return categoryDisplayEntries;
 }
 
-const std::vector<std::string>& Settings::getDifficultyEntries() const {
-    return difficultyEntries;
+const std::vector<std::string>& Settings::getDifficultyDisplayEntries() const {
+    return difficultyDisplayEntries;
 }
 
-const std::vector<std::string>& Settings::getTypeEntries() const {
-    return typeEntries;
+const std::vector<std::string>& Settings::getTypeDisplayEntries() const {
+    return typeDisplayEntries;
 }
 
 const std::vector<std::string>& Settings::getSoundEffectEntries() const {
     return soundEffectEntries;
 }
 
-const std::string Settings::getAPISessionToken() const {
-    return APISessionToken;
+void Settings::setCategoryAPIValueEntries(const std::vector<int> pCategoryAPIValueEntries) {
+    categoryAPIValueEntries = pCategoryAPIValueEntries;
 }
 
-void Settings::setCategoryIdEntries(const std::vector<int> pCategoryIdEntries) {
-    categoryIdEntries = pCategoryIdEntries;
-}
-
-void Settings::setCategoryNameEntries(const std::vector<std::string> pCategoryNameEntries) {
-    categoryNameEntries = pCategoryNameEntries;
+void Settings::setCategoryDisplayEntries(const std::vector<std::string> pCategoryDisplayEntries) {
+    categoryDisplayEntries = pCategoryDisplayEntries;
 }

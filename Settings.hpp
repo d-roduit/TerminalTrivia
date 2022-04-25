@@ -12,28 +12,27 @@ public:
     int selectedSoundEffect;
 
 private:
-    const int amount{ 1 };
-    std::vector<int> categoryIdEntries;
-    std::vector<std::string> categoryNameEntries;
-    std::vector<std::string> difficultyEntries;
-    std::vector<std::string> typeEntries;
+    std::vector<int> categoryAPIValueEntries;
+    std::vector<std::string> categoryDisplayEntries;
+    std::vector<std::string> difficultyDisplayEntries;
+    std::vector<std::string> difficultyAPIValueEntries;
+    std::vector<std::string> typeDisplayEntries;
+    std::vector<std::string> typeAPIValueEntries;
     std::vector<std::string> soundEffectEntries;
-    std::string APISessionToken;
 
 public:
     static Settings& getInstance();
-    const int getCategoryId() const;
-    const std::string getDifficulty() const;
-    const std::string getType() const;
-    const int getAmount() const;
+
+    const int getCategoryAPIValue() const;
+    const std::string getDifficultyAPIValue() const;
+    const std::string getTypeAPIValue() const;
     const bool areSoundEffectsEnabled() const;
-    const std::vector<std::string>& getCategoryNameEntries() const;
-    const std::vector<std::string>& getDifficultyEntries() const;
-    const std::vector<std::string>& getTypeEntries() const;
+    const std::vector<std::string>& getCategoryDisplayEntries() const;
+    const std::vector<std::string>& getDifficultyDisplayEntries() const;
+    const std::vector<std::string>& getTypeDisplayEntries() const;
     const std::vector<std::string>& getSoundEffectEntries() const;
-    const std::string getAPISessionToken() const;
-    void setCategoryIdEntries(const std::vector<int> categoryIdEntries);
-    void setCategoryNameEntries(const std::vector<std::string> categoryNameEntries);
+    void setCategoryAPIValueEntries(const std::vector<int> pCategoryAPIValueEntries);
+    void setCategoryDisplayEntries(const std::vector<std::string> pCategoryDisplayEntries);
 
     Settings(Settings const&) = delete;
     void operator=(Settings const&) = delete;

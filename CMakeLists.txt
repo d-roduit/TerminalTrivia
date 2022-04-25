@@ -7,7 +7,7 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 project ("TerminalTrivia")
 
 # Add source for the executable
-add_executable (TerminalTrivia "TerminalTrivia.cpp" "AsciiDisplayUtils.cpp"  "Stats.cpp" "Question.cpp" "Settings.cpp" "Main.cpp")
+add_executable (TerminalTrivia "TerminalTrivia.cpp" "AsciiDisplayUtils.cpp"  "Stats.cpp" "Question.cpp" "Settings.cpp" "Main.cpp" "TriviaAPI.cpp")
 
 include(FetchContent)
 
