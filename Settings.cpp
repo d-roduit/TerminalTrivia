@@ -1,6 +1,3 @@
-#include <cpr/cpr.h>
-#include <nlohmann/json.hpp>
-#include <ctime>
 #include "Settings.hpp"
 
 Settings& Settings::getInstance() {

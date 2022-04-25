@@ -24,7 +24,7 @@ int Stats::getPositiveAnswersRate() const {
 	return (int)round((nbPositiveAnswers / (double)nbAnsweredQuestions) * 100);
 }
 
-void Stats::incrementNbAnsweredQuestions(bool hasAnsweredCorrectly) {
+void Stats::incrementNbAnsweredQuestions(bool pHasAnsweredCorrectly) {
 	nbAnsweredQuestions++;
-	if (hasAnsweredCorrectly) nbPositiveAnswers++;
+	if (pHasAnsweredCorrectly) nbPositiveAnswers++;
 }

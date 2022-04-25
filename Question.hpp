@@ -1,10 +1,8 @@
 #pragma once
 
-#include <algorithm>
-#include <random>
+#include <random> // for uniform_int_distribution, mt19937
 #include <string>
 #include <vector>
-#include <map>
 
 class Question {
 
@@ -37,4 +35,5 @@ public:
     const std::vector<std::string>& getIncorrectAnswers() const;
     const std::vector<std::string>& getAllPossibleAnswers() const;
     const int getCorrectAnswerIndex() const;
+
 };

@@ -1,19 +1,18 @@
-#include "Windows.h" // for PlaySound
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
-#include "ftxui/component/component_base.hpp"      // for ComponentBase
-#include "ftxui/component/component_options.hpp"   // for ButtonOption
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include "ftxui/screen/color.hpp"  // for Color, Color::Blue, Color::Green, Color::Red
-#include <ftxui/dom/elements.hpp>   // for filler, text, hbox, vbox
-#include <ftxui/screen/screen.hpp>  // for Full, Screen
-#include <cpr/cpr.h>
-#include <nlohmann/json.hpp>
-#include <thread>
-#include <chrono>
 #include <string>
+#include <vector>
+#include <map>
+#include "Windows.h" // for PlaySound
+#include "ftxui/component/component.hpp" // for Button, Horizontal, Renderer
+#include "ftxui/component/component_base.hpp" // for ComponentBase
+#include "ftxui/component/screen_interactive.hpp" // for ScreenInteractive
+#include "ftxui/screen/color.hpp" // for Color, Color::Blue, Color::Green, Color::Red
+#include <ftxui/dom/elements.hpp> // for Elements, Element, filler, text, hbox, vbox
+#include <ftxui/screen/screen.hpp> // for Screen
 #include "AsciiDisplayUtils.hpp"
 #include "Question.hpp"
+#include "Settings.hpp"
+#include "Stats.hpp"
+#include "TriviaAPI.hpp"
 #include "TerminalTrivia.hpp"
 
 TerminalTrivia::TerminalTrivia() : settings(Settings::getInstance()), stats(Stats::getInstance()), triviaAPI(TriviaAPI::getInstance()) {
@@ -164,7 +163,6 @@ void TerminalTrivia::renderPlay() {
             (hasUserAnswered) ? ftxui::separatorEmpty() : ftxui::emptyElement(),
             (hasUserAnswered && isUserAnswerCorrect) ? ftxui::text("Good answer !") | ftxui::color(ftxui::Color::Green) : ftxui::emptyElement(),
             (hasUserAnswered && !isUserAnswerCorrect) ? ftxui::text("You will have better luck next question :)") | ftxui::color(ftxui::Color::Red) : ftxui::emptyElement(),
-            //ftxui::text("selectedAnswerIndex: " + std::to_string(selectedAnswerIndex)),
         });
     });
 

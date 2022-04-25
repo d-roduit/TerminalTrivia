@@ -4,8 +4,12 @@
 */
 
 #include <string>
+#include <vector>
+#include <map>
+#include <sstream>
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
+#include "Question.hpp"
 #include "TriviaAPI.hpp"
 
 std::string TriviaAPI::API_ENDPOINT_TOKEN{ "https://opentdb.com/api_token.php" };

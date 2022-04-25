@@ -6,8 +6,6 @@
 
 class TriviaAPI {
 
-public:
-
 private:
     static std::string API_ENDPOINT_TOKEN;
     static std::string API_ENDPOINT_CATEGORIES;
@@ -29,4 +27,5 @@ private:
     void fetchSessionToken();
     void resetSessionToken() const;
     const std::string decodeHTMLEntities(std::string pString) const;
+
 };

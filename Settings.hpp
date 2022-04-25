@@ -39,4 +39,5 @@ public:
 
 private:
     Settings();
+
 };
