@@ -3,11 +3,12 @@
 # Configure the output directory for the libraries to be the same as the executable directory
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+set( APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/appicon.rc" )
 
 project ("TerminalTrivia")
 
 # Add source for the executable
-add_executable (TerminalTrivia "TerminalTrivia.cpp" "AsciiDisplayUtils.cpp"  "Stats.cpp" "Question.cpp" "Settings.cpp" "Main.cpp" "TriviaAPI.cpp")
+add_executable (TerminalTrivia "TerminalTrivia.cpp" "AsciiDisplayUtils.cpp"  "Stats.cpp" "Question.cpp" "Settings.cpp" "Main.cpp" "TriviaAPI.cpp" ${APP_ICON_RESOURCE_WINDOWS})
 
 include(FetchContent)
 
