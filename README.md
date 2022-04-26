@@ -1,20 +1,18 @@
 <div align="center">
-    <br/>
-    <a href="https://github.com/d-roduit/TerminalTrivia">
-        <img src="readme_pictures/TerminalTrivia_Logo.png" align="center" width="20%" alt="TerminalTrivia Logo">
-    </a>
+<br/>
+<a href="https://github.com/d-roduit/TerminalTrivia">
+<img src="readme_pictures/TerminalTrivia_Logo.png" align="center" width="20%" alt="TerminalTrivia Logo">
+</a>
 
 #
 
-    <p align="center">
-        <strong>TerminalTrivia, a Trivia quiz game playable directly from your terminal 💻⚡️</strong>
-    </p>
+<p align="center"><strong>TerminalTrivia, a Trivia quiz game playable directly from your terminal 💻⚡️</strong></p>
 </div>
 
 <div align="center">
-    <a href="https://github.com/d-roduit/TerminalTrivia">
-        <img src="readme_pictures/TerminalTrivia_Screenshot.png" align="center" width="80%" alt="TerminalTrivia Screenshot">
-    </a>
+<a href="https://github.com/d-roduit/TerminalTrivia">
+<img src="readme_pictures/TerminalTrivia_Screenshot.png" align="center" width="80%" alt="TerminalTrivia Screenshot">
+</a>
 </div>
 <br/>
 <br/>
