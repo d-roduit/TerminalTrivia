@@ -17,6 +17,7 @@ std::string TriviaAPI::API_ENDPOINT_CATEGORIES{ "https://opentdb.com/api_categor
 std::string TriviaAPI::API_ENDPOINT_QUESTIONS{ "https://opentdb.com/api.php" };
 
 std::map<std::string, std::string> TriviaAPI::HTML_ENTITIES_CONVERSION_TABLE{
+    {"&#039;", "'"},
     {"&excl;", "!"},
     {"&quot;", "\""},
     {"&num;", "#"},
