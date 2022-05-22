@@ -30,7 +30,7 @@
 There are two ways to run the game:
 
 1. **Run the executable:** The first and fastest way is to simply download the game executable (packaged in zip format) from the [releases section](https://github.com/d-roduit/TerminalTrivia/releases) and run it. There is only a release for Windows though, so if you use another operating system, please follow the second option.
-2. **Build the executable from source:** This project uses CMake. To build the executable, the fastest way is to download this project and open it in an editor that supports CMake (e.g. Visual Studio). Then, use the editor to build the executable in release configuration. The release folder, which contains the executable, will be located in the `out\build` folder at root of the project.
+2. **Build the executable from source:** This project uses CMake. To build the executable, the fastest way is to download this project and open it in an editor that supports CMake (e.g. Visual Studio). The editor will use CMake to automatically download the project's dependencies when you first open the project _(CMake uses Git to download the dependencies. It is therefore required to have Git installed beforehand)_. Then, use the editor to build the executable in the configuration of your choice (Debug / Release). You do that by first choosing a build configuration (Debug is the default) then clicking on `Build > Build all` in the menu bar. The debug / release folder, which contains the executable, will be located in the `out\build` folder at root of the project.
 
 ## <a name="technologies"></a>Technologies
 
